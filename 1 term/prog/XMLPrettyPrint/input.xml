@@ -2,7 +2,7 @@
                 <div class="sound-icon"/>
                 <div class="sound-wave sound-wave_one"/><div class="sound-wave sound-wave_two"/><div class="sound-wave sound-wave_three"/></div><div class="segments-box">
                 <div data-range="1-20" class="segment"><span/></div>
-                                    <<div data-range="21-40" class="segment"><span/></div>    <div data-range="41-60" class="segment">
+                                    <div data-range="21-40" class="segment"><span/></div>    <div data-range="41-60" class="segment">
                     <span/>
                 </div>
                 <div data-range="61-80" class="segment">

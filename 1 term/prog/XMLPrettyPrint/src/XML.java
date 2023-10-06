@@ -47,6 +47,7 @@ public class XML {
             boolean skipTagAttributes = false;
             boolean isClosingTag = false;
             boolean needNewLine = true;
+            boolean isException = false;
             Stack<String> syntaxStack = new Stack<>();
             char[] aux;
             StringBuilder pretty = new StringBuilder();
@@ -71,11 +72,15 @@ public class XML {
                                 int j = 0;
                                 while (j < prevTag.length)
                                 {
-                                    if (aux[i + j] != prevTag[j])
+                                    if (aux[i + j] != prevTag[j] && !isException) {
                                         exceptions.add(new SyntaxException(row, i + j));
+                                        isException = true;
+                                    }
+
                                     pretty.append(aux[i + j]);
                                     j++;
                                 }
+                                isException = false;
                                 i +=j;
                                 isClosingTag = true;
                             }
