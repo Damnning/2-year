@@ -7,5 +7,6 @@ public class Main {
         file.makePretty();
         System.out.println(String.join("", Collections.nCopies(10,"-")));
         file.printFile();
+        file.printExceptions();
     }
 }

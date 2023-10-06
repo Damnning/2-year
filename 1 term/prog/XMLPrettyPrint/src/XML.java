@@ -1,22 +1,21 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.SQLOutput;
-import java.util.Collections;
-import java.util.Scanner;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class XML {
     public String getXml() {
         return xml;
     }
-    private String path;
-
+    private final String path;
+    private final ArrayList<SyntaxException> exceptions;
     private String xml;
 
     public XML(String path) {
         this.readFromFile(path);
         this.path = path;
+        exceptions = new ArrayList<>();
     }
 
     public void readFromFile(String path) {
@@ -42,8 +41,8 @@ public class XML {
             int depth = 0;
             int row = 0;
             boolean skipSpaces = true;
-            boolean insideTag = false;
             boolean insideRoot = false;
+            boolean insideTag = false;
             boolean checkClose = false;
             boolean skipTagAttributes = false;
             boolean isClosingTag = false;
@@ -60,11 +59,12 @@ public class XML {
                     if ((!skipSpaces || aux[i] != ' ') && !skipTagAttributes) {
                         // Checking if pointer inside root
                         if (!insideRoot && aux[i] != '<')
-                            throw new SyntaxException(i, row);
+                            exceptions.add(new SyntaxException(i,row));
                         // Checking if its close tag
                         if(checkClose) {
                             checkClose = false;
                             if (aux[i] == '/') {
+                                // If it's close check tags nesting
                                 pretty.append(aux[i]);
                                 i++;
                                 char[] prevTag = syntaxStack.pop().toCharArray();
@@ -72,16 +72,16 @@ public class XML {
                                 while (j < prevTag.length)
                                 {
                                     if (aux[i + j] != prevTag[j])
-                                        throw new SyntaxException(row, i + j);
+                                        exceptions.add(new SyntaxException(row, i + j));
                                     pretty.append(aux[i + j]);
                                     j++;
                                 }
                                 i +=j;
                                 isClosingTag = true;
-
                             }
 
                         }
+                        //  Tag start check
                         if (!insideTag && aux[i] == '<') {
                             if (!insideRoot) insideRoot = true;
                             insideTag = true;
@@ -90,8 +90,8 @@ public class XML {
                             if(aux[i+1]=='/') depth--;
                             pretty.append(getIntend(indent,depth));
                             if(aux[i+1]!='/') depth++;
-
                             pretty.append(aux[i]);
+                        // Tag ending check
                         } else if (insideTag && aux[i] == '>') {
                             insideTag = false;
                             pretty.append(aux[i]);
@@ -101,6 +101,7 @@ public class XML {
                             skipSpaces = true;
                             needNewLine = true;
                             tag.setLength(0);
+                        // Tag body appending
                         } else if (insideTag) {
                             if(aux[i] == ' ') {
                                 pretty.append(aux[i]);
@@ -110,10 +111,10 @@ public class XML {
                                 tag.append(aux[i]);
                                 pretty.append(aux[i]);
                             }
+                        // Content append
                         } else {
                             if(needNewLine) {
                                 pretty.append(getIntend(indent, depth));
-
                             }
                             pretty.append(aux[i]);
                             needNewLine = false;
@@ -141,11 +142,16 @@ public class XML {
 
     }
     private String getIntend(int indent, int depth){
-        StringBuilder str = new StringBuilder();
-        str.append("\n");
-        str.append(String.join("", Collections.nCopies(indent * depth, " ")));
-        return str.toString();
+        return "\n" +
+                String.join("", Collections.nCopies(indent * depth, " "));
     }
+    public void printExceptions(){
+        for (var item:exceptions) {
+            System.out.println(item.getDetails());
+        }
+
+    }
+
     public void printFile() {
         System.out.println(xml);
     }
