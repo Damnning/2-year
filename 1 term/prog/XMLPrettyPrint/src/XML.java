@@ -5,9 +5,17 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class XML {
+    private final String FORMATERR = "Not an xml file";
+    private final String FORMAT = ".xml";
+    private final String NEWLINE = "\n";
+    private final char GAP = ' ';
+    private final char OPEN = '<';
+    private final char CLOSE = '>';
+
     public String getXml() {
         return xml;
     }
+
     private final String path;
     private final ArrayList<SyntaxException> exceptions;
     private String xml;
@@ -21,14 +29,14 @@ public class XML {
     public void readFromFile(String path) {
         try (Scanner scanner = new Scanner(new File(path))) {
             StringBuilder temp = new StringBuilder();
-            if (path.endsWith(".xml")) {
+            if (path.endsWith(FORMAT)) {
                 while (scanner.hasNext()) {
                     temp.append(scanner.nextLine());
-                    temp.append("\n");
+                    temp.append(NEWLINE);
                 }
                 xml = temp.toString();
             } else {
-                System.out.println("Not an xml file");
+                System.out.println(FORMATERR);
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -36,7 +44,7 @@ public class XML {
     }
 
     public void makePretty() {
-        try (Scanner scanner = new Scanner(new File(path));) {
+        try {
             int indent = 4;
             int depth = 0;
             int row = 0;
@@ -52,7 +60,11 @@ public class XML {
             char[] aux;
             StringBuilder pretty = new StringBuilder();
             StringBuilder tag = new StringBuilder();
-            while (scanner.hasNext()) {
+
+
+
+
+            /*while (scanner.hasNext()) {
                 aux = scanner.nextLine().toCharArray();
                 row++;
                   for (int i = 0; i < aux.length; i++) {
@@ -136,7 +148,7 @@ public class XML {
 
                 }
             }
-            xml =  pretty.toString();
+            xml =  pretty.toString();*/
         } catch (Exception e) {
             if (e instanceof SyntaxException err) {
                 System.out.println(err.getDetails());
@@ -146,12 +158,27 @@ public class XML {
         }
 
     }
-    private String getIntend(int indent, int depth){
+
+    private String getIntend(int indent, int depth) {
         return "\n" +
                 String.join("", Collections.nCopies(indent * depth, " "));
     }
-    public void printExceptions(){
-        for (var item:exceptions) {
+
+    private void parseContent(char[] target, int idx) {
+
+    }
+
+    private int skipSpaces(int i, char[] target) {
+        i++;
+        for (; i < target.length; i++) {
+            if (target[i] != GAP)
+                return i;
+        }
+        return i;
+    }
+
+    public void printExceptions() {
+        for (var item : exceptions) {
             System.out.println(item.getDetails());
         }
 
