@@ -1,16 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.SQLOutput;
 import java.util.*;
-import java.util.regex.Pattern;
 
 public class XML {
-    private final String FORMATERR = "Not an xml file";
-    private final String FORMAT = ".xml";
-    private final String NEWLINE = "\n";
-    private final char GAP = ' ';
-    private final char OPEN = '<';
-    private final char CLOSE = '>';
+    private final String FORMATERR = "Not an xml file", FORMAT = ".xml", XML = "xml", VERATT1 = "version=\"1.0\"", VERATT2 = "encoding=\"UTF-8\"", EMPTY = "";
+    private final char SPACE = ' ', START = '<', FINISH = '>', QM = '?', CLOSE = '/', NEWLINE = '\n';
 
     public String getXml() {
         return xml;
@@ -18,7 +12,11 @@ public class XML {
 
     private final String path;
     private final ArrayList<SyntaxException> exceptions;
+    private VersionTag root;
     private String xml;
+    private char[] target;
+    private int idx;
+    private Stack<String> stack;
 
     public XML(String path) {
         this.readFromFile(path);
@@ -43,138 +41,151 @@ public class XML {
         }
     }
 
+    public String getPretty(int intend) {
+        return root.getToken(intend, 0);
+    }
+
     public void makePretty() {
-        try {
-            int indent = 4;
-            int depth = 0;
-            int row = 0;
-            boolean skipSpaces = true;
-            boolean insideRoot = false;
-            boolean insideTag = false;
-            boolean checkClose = false;
-            boolean skipTagAttributes = false;
-            boolean isClosingTag = false;
-            boolean needNewLine = true;
-            boolean isException = false;
-            Stack<String> syntaxStack = new Stack<>();
-            char[] aux;
-            StringBuilder pretty = new StringBuilder();
-            StringBuilder tag = new StringBuilder();
+        stack = new Stack<>();
+        idx = 0;
+        target = xml.toCharArray();
+        skipUntil(START);
+        idx++;
+        parseVersion();
+    }
 
-
-
-
-            /*while (scanner.hasNext()) {
-                aux = scanner.nextLine().toCharArray();
-                row++;
-                  for (int i = 0; i < aux.length; i++) {
-                    // Checking if spaces could be skipped
-                    if ((!skipSpaces || aux[i] != ' ') && !skipTagAttributes) {
-                        // Checking if pointer inside root
-                        if (!insideRoot && aux[i] != '<')
-                            exceptions.add(new SyntaxException(i,row));
-                        // Checking if its close tag
-                        if(checkClose) {
-                            checkClose = false;
-                            if (aux[i] == '/') {
-                                // If it's close check tags nesting
-                                pretty.append(aux[i]);
-                                i++;
-                                char[] prevTag = syntaxStack.pop().toCharArray();
-                                int j = 0;
-                                while (j < prevTag.length)
-                                {
-                                    if (aux[i + j] != prevTag[j] && !isException) {
-                                        exceptions.add(new SyntaxException(row, i + j));
-                                        isException = true;
-                                    }
-
-                                    pretty.append(aux[i + j]);
-                                    j++;
-                                }
-                                isException = false;
-                                i +=j;
-                                isClosingTag = true;
-                            }
-
-                        }
-                        //  Tag start check
-                        if (!insideTag && aux[i] == '<') {
-                            if (!insideRoot) insideRoot = true;
-                            insideTag = true;
-                            checkClose = true;
-                            skipSpaces = false;
-                            if(aux[i+1]=='/') depth--;
-                            pretty.append(getIntend(indent,depth));
-                            if(aux[i+1]!='/') depth++;
-                            pretty.append(aux[i]);
-                        // Tag ending check
-                        } else if (insideTag && aux[i] == '>') {
-                            insideTag = false;
-                            pretty.append(aux[i]);
-                            if(aux[i-1] =='/') depth--;
-                            if(!isClosingTag && aux[i-1] !='/') syntaxStack.push(tag.toString());
-                            isClosingTag = false;
-                            skipSpaces = true;
-                            needNewLine = true;
-                            tag.setLength(0);
-                        // Tag body appending
-                        } else if (insideTag) {
-                            if(aux[i] == ' ') {
-                                pretty.append(aux[i]);
-                                skipTagAttributes = true;
-                            }
-                            else{
-                                tag.append(aux[i]);
-                                pretty.append(aux[i]);
-                            }
-                        // Content append
-                        } else {
-                            if(needNewLine) {
-                                pretty.append(getIntend(indent, depth));
-                            }
-                            pretty.append(aux[i]);
-                            needNewLine = false;
-                            skipSpaces = false;
-                        }
-
-                    } else if (insideTag) {
-                        if(aux[i] == '>'){
-                            i--;
-                            skipTagAttributes = false;
-                        }
-                        if(skipTagAttributes) pretty.append(aux[i]);
-                    }
-
-                }
+    private ArrayList<Token> parseContent(String parent) {
+        ArrayList<Token> tokens = new ArrayList<>();
+        do {
+            skipSpaces();
+            switch (target[idx]) {
+                case START -> tokens.add(parseTag());
+                default -> tokens.add(parseText());
             }
-            xml =  pretty.toString();*/
+        } while (stack.size() > 1 && checkClose(parent));
+        return tokens;
+    }
+
+    private boolean checkClose(String parent) {
+        boolean result = false;
+        try {
+            int back = idx;
+            skipUntil(START);
+            idx++;
+            skipSpaces();
+            if (target[idx] == CLOSE) {
+                idx++;
+                String name = replaceSpaces(getUntil(FINISH), String.valueOf(SPACE)).split(String.valueOf(SPACE))[0];
+                idx++;
+                if (stack.pop().equals(name))
+                    result = false;
+                else {
+                    throw new SyntaxException(idx);
+                }
+            } else {
+                result = true;
+                idx = back;
+            }
+
+
         } catch (Exception e) {
             if (e instanceof SyntaxException err) {
                 System.out.println(err.getDetails());
             } else {
-                System.out.println(e.getMessage());
+                System.out.println(e.getCause());
             }
         }
-
+        return result;
     }
 
-    private String getIntend(int indent, int depth) {
-        return "\n" +
-                String.join("", Collections.nCopies(indent * depth, " "));
+    private Text parseText() {
+        return new Text(getUntil(START));
     }
 
-    private void parseContent(char[] target, int idx) {
+    private GeneralTag parseTag() {
+        idx++;
+        GeneralTag tag;
+        String[] aux = replaceSpaces(getUntil(FINISH), String.valueOf(SPACE)).split(String.valueOf(SPACE));
+        String name = aux[0];
+        idx++;
+        if (aux[aux.length - 1].contains(String.valueOf(CLOSE))) {
+            int border;
+            if (aux[aux.length - 1].equals(String.valueOf(CLOSE))) {
+                border = aux.length - 1;
+            } else {
+                border = aux.length;
+                name = aux[aux.length - 1].substring(0, aux[aux.length - 1].length() - 1);
+            }
 
-    }
-
-    private int skipSpaces(int i, char[] target) {
-        i++;
-        for (; i < target.length; i++) {
-            if (target[i] != GAP)
-                return i;
+            tag = new AutoClosableTag(name);
+            for (int i = 1; i < border; i++) {
+                tag.addAttribute(aux[i]);
+            }
+        } else {
+            tag = new Tag(name);
+            for (int i = 1; i < aux.length; i++)
+                tag.addAttribute(aux[i]);
+            stack.push(name);
+            ((Tag) tag).addContent(parseContent(tag.getName()));
         }
-        return i;
+        return tag;
+    }
+
+    private void parseVersion() {
+        if (target[idx] == QM) {
+            idx++;
+            root = new VersionTag(getUntil(SPACE));
+            String[] aux = replaceSpaces(getUntil(QM), String.valueOf(SPACE)).split(String.valueOf(SPACE));
+            for (String attribute : aux) {
+                root.addAttribute(attribute);
+            }
+        } else {
+            idx--;
+            root = new VersionTag(XML);
+            root.addAttribute(VERATT1);
+            root.addAttribute(VERATT2);
+        }
+        stack.push(root.getName());
+        root.addContent(parseContent(root.getName()));
+    }
+
+    private String getUntil(char border) {
+        String substring = "";
+        while (target[idx] != border) {
+            substring += target[idx];
+            idx++;
+        }
+        return substring;
+    }
+
+    public String replaceSpaces(String target, String replacement) {
+        char[] aux = target.toCharArray();
+        String result = "";
+        for (int i = 1; i < aux.length; i++) {
+            if (aux[i - 1] == SPACE && aux[i] != SPACE) {
+                result += replacement;
+            } else if (aux[i - 1] != SPACE) {
+                result += aux[i - 1];
+            }
+        }
+        if (aux[aux.length - 1] != SPACE) {
+            result += aux[aux.length - 1];
+        }
+        return result;
+    }
+
+    private void skipUntil(char border) {
+        while (target[idx] != border && idx < target.length - 1) {
+            idx++;
+        }
+    }
+
+    private void skipSpaces() {
+        for (; idx < target.length - 1; idx++) {
+            if (target[idx] != SPACE && target[idx] != NEWLINE) {
+                return;
+            }
+        }
     }
 
     public void printExceptions() {

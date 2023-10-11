@@ -4,7 +4,7 @@ public class Text implements Token {
         this.content = content;
     }
     @Override
-    public String getToken() {
-        return content;
+    public String getToken(int intend, int depth) {
+        return SPACE.repeat(intend*depth) + content + NL;
     }
 }
