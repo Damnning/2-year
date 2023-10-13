@@ -1,4 +1,6 @@
-import java.util.Collections;
+package ru.vsu.cs.xmlpretty.main;
+
+import ru.vsu.cs.xmlpretty.file.XML;
 
 public class Main {
     public static void main(String[] args) {

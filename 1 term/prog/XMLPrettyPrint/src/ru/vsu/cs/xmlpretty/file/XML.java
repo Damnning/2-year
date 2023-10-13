@@ -1,15 +1,16 @@
+package ru.vsu.cs.xmlpretty.file;
+
+import ru.vsu.cs.xmlpretty.tokens.*;
+import ru.vsu.cs.xmlpretty.tokens.tags.AutoClosableTag;
+import ru.vsu.cs.xmlpretty.tokens.tags.GeneralTag;
+import ru.vsu.cs.xmlpretty.tokens.tags.Tag;
+import ru.vsu.cs.xmlpretty.tokens.tags.VersionTag;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
-public class XML {
-    private final String FORMATERR = "Not an xml file", FORMAT = ".xml", XML = "xml", VERATT1 = "version=\"1.0\"", VERATT2 = "encoding=\"UTF-8\"", EMPTY = "";
-    private final char SPACE = ' ', START = '<', FINISH = '>', QM = '?', CLOSE = '/', NEWLINE = '\n';
-
-    public String getXml() {
-        return xml;
-    }
-
+public class XML implements XMLConstants {
     private final String path;
     private final ArrayList<SyntaxException> exceptions;
     private VersionTag root;
@@ -17,7 +18,9 @@ public class XML {
     private char[] target;
     private int idx;
     private Stack<String> stack;
-
+    public String getXml() {
+        return xml;
+    }
     public XML(String path) {
         this.readFromFile(path);
         this.path = path;
@@ -34,7 +37,8 @@ public class XML {
                 }
                 xml = temp.toString();
             } else {
-                System.out.println(FORMATERR);
+
+                System.out.println(FORMATERROR);
             }
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
@@ -142,8 +146,8 @@ public class XML {
         } else {
             idx--;
             root = new VersionTag(XML);
-            root.addAttribute(VERATT1);
-            root.addAttribute(VERATT2);
+            root.addAttribute(VERSIONATTRIBUTE1);
+            root.addAttribute(VERSIONATTRIBUTE2);
         }
         stack.push(root.getName());
         root.addContent(parseContent(root.getName()));
