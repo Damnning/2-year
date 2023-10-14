@@ -10,9 +10,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 
+
 public class XML implements XMLConstants {
-    private final String path;
-    private final ArrayList<SyntaxException> exceptions;
     private VersionTag root;
     private String xml;
     private char[] target;
@@ -23,8 +22,6 @@ public class XML implements XMLConstants {
     }
     public XML(String path) {
         this.readFromFile(path);
-        this.path = path;
-        exceptions = new ArrayList<>();
     }
 
     public void readFromFile(String path) {
@@ -53,39 +50,35 @@ public class XML implements XMLConstants {
         stack = new Stack<>();
         idx = 0;
         target = xml.toCharArray();
-        skipUntil(START);
-        idx++;
         parseVersion();
     }
 
-    private ArrayList<Token> parseContent(String parent) {
+    private ArrayList<Token> parseContent() {
         ArrayList<Token> tokens = new ArrayList<>();
         do {
             skipSpaces();
-            switch (target[idx]) {
-                case START -> tokens.add(parseTag());
-                default -> tokens.add(parseText());
+            if (target[idx] == START) {
+                tokens.add(parseTag());
+            } else {
+                tokens.add(parseText());
             }
-        } while (stack.size() > 1 && checkClose(parent));
+        } while (stack.size() > 1 && checkClose());
         return tokens;
     }
 
-    private boolean checkClose(String parent) {
+    private boolean checkClose() {
         boolean result = false;
         try {
             int back = idx;
             skipUntil(START);
-            idx++;
             skipSpaces();
             if (target[idx] == CLOSE) {
-                idx++;
+                skipUntil(START);
+                skipSpaces();
                 String name = replaceSpaces(getUntil(FINISH), String.valueOf(SPACE)).split(String.valueOf(SPACE))[0];
-                idx++;
-                if (stack.pop().equals(name))
-                    result = false;
-                else {
+                skipUntil(FINISH);
+                if (!stack.pop().equals(name))
                     throw new SyntaxException(idx);
-                }
             } else {
                 result = true;
                 idx = back;
@@ -96,7 +89,7 @@ public class XML implements XMLConstants {
             if (e instanceof SyntaxException err) {
                 System.out.println(err.getDetails());
             } else {
-                System.out.println(e.getCause());
+                System.err.println();
             }
         }
         return result;
@@ -107,11 +100,12 @@ public class XML implements XMLConstants {
     }
 
     private GeneralTag parseTag() {
-        idx++;
         GeneralTag tag;
+        skipUntil(START);
+        skipSpaces();
         String[] aux = replaceSpaces(getUntil(FINISH), String.valueOf(SPACE)).split(String.valueOf(SPACE));
         String name = aux[0];
-        idx++;
+        skipUntil(FINISH);
         if (aux[aux.length - 1].contains(String.valueOf(CLOSE))) {
             int border;
             if (aux[aux.length - 1].equals(String.valueOf(CLOSE))) {
@@ -130,58 +124,62 @@ public class XML implements XMLConstants {
             for (int i = 1; i < aux.length; i++)
                 tag.addAttribute(aux[i]);
             stack.push(name);
-            ((Tag) tag).addContent(parseContent(tag.getName()));
+            ((Tag) tag).addContent(parseContent());
         }
         return tag;
     }
 
     private void parseVersion() {
+        int back = idx;
+        skipUntil(START);
         if (target[idx] == QM) {
-            idx++;
+            skipUntil(QM);
+            skipSpaces();
             root = new VersionTag(getUntil(SPACE));
             String[] aux = replaceSpaces(getUntil(QM), String.valueOf(SPACE)).split(String.valueOf(SPACE));
             for (String attribute : aux) {
                 root.addAttribute(attribute);
             }
         } else {
-            idx--;
+            idx = back;
             root = new VersionTag(XML);
             root.addAttribute(VERSIONATTRIBUTE1);
             root.addAttribute(VERSIONATTRIBUTE2);
         }
         stack.push(root.getName());
-        root.addContent(parseContent(root.getName()));
+        root.addContent(parseContent());
     }
 
     private String getUntil(char border) {
-        String substring = "";
+        StringBuilder substring = new StringBuilder();
         while (target[idx] != border) {
-            substring += target[idx];
+            substring.append(target[idx]);
             idx++;
         }
-        return substring;
+        return substring.toString();
     }
 
     public String replaceSpaces(String target, String replacement) {
         char[] aux = target.toCharArray();
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (int i = 1; i < aux.length; i++) {
             if (aux[i - 1] == SPACE && aux[i] != SPACE) {
-                result += replacement;
+                result.append(replacement);
             } else if (aux[i - 1] != SPACE) {
-                result += aux[i - 1];
+                result.append(aux[i - 1]);
             }
         }
         if (aux[aux.length - 1] != SPACE) {
-            result += aux[aux.length - 1];
+            result.append(aux[aux.length - 1]);
         }
-        return result;
+        return result.toString();
     }
 
     private void skipUntil(char border) {
         while (target[idx] != border && idx < target.length - 1) {
             idx++;
         }
+        idx++;
     }
 
     private void skipSpaces() {
@@ -190,13 +188,6 @@ public class XML implements XMLConstants {
                 return;
             }
         }
-    }
-
-    public void printExceptions() {
-        for (var item : exceptions) {
-            System.out.println(item.getDetails());
-        }
-
     }
 
     public void printFile() {

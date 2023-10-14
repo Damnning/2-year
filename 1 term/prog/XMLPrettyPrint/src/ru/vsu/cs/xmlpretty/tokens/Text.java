@@ -3,7 +3,7 @@ package ru.vsu.cs.xmlpretty.tokens;
 import ru.vsu.cs.xmlpretty.tokens.Token;
 
 public class Text implements Token {
-    private String content;
+    private final String content;
 
     public Text(String content) {
         this.content = content;

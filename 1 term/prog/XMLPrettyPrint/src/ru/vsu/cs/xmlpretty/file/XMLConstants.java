@@ -5,7 +5,6 @@ public interface XMLConstants {
     String XML = "xml";
     String VERSIONATTRIBUTE1 = "version=\"1.0\"";
     String VERSIONATTRIBUTE2 = "encoding=\"UTF-8\"";
-    String EMPTY = "";
     String FORMATERROR = "Not an xml file";
     char SPACE = ' ';
     char START = '<';

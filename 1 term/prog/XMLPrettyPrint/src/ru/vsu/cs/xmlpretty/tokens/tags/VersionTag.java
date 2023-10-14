@@ -14,10 +14,10 @@ public class VersionTag extends Tag {
 
     @Override
     public String getToken(int intend, int depth) {
-        String tag = getTag();
+        StringBuilder tag = new StringBuilder(getTag());
         for (Token token : getContent()) {
-            tag += token.getToken(intend, depth);
+            tag.append(token.getToken(intend, depth));
         }
-        return tag;
+        return tag.toString();
     }
 }
