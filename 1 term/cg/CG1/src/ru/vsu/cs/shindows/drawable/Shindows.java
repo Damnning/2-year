@@ -1,3 +1,5 @@
+package ru.vsu.cs.shindows.drawable;
+
 import java.awt.*;
 import java.awt.geom.*;
 
@@ -6,6 +8,10 @@ public class Shindows {
         CONVEX,
         CONCAVE
     }
+    final private Color ShindowsRed = new Color(248, 104, 40);
+    final private Color ShindowsGreen = new Color(146, 196, 0);
+    final private Color ShindowsBlue = new Color(0, 181, 241);
+    final private Color ShindowsYellow = new Color(255, 196, 0);
 
     public void setX(int x) {
         this.x = x;
@@ -103,23 +109,20 @@ public class Shindows {
         y += speedY;
     }
 
-    void draw(final Graphics2D g) {
+    public void draw(final Graphics2D g) {
         AffineTransform straight = g.getTransform();
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, panelWidth, panelHeight);
         g.rotate(Math.toRadians(angle), x + width / 2, y + height / 2);
-        g.setColor(new Color(248, 104, 40));
+        g.setColor(ShindowsRed);
         g.fill(getFlag(x, y + height / 50, width / 2 - width / 20, height / 2 - height / 20, MODE.CONCAVE));
-        g.setColor(new Color(146, 196, 0));
+        g.setColor(ShindowsGreen);
         g.fill(getFlag(x + width / 2 + width / 20, y - height / 50, width / 2 - width / 20, height / 2 - height / 20, MODE.CONVEX));
-        g.setColor(new Color(0, 181, 241));
+        g.setColor(ShindowsBlue);
         g.fill(getFlag(x, y + height / 50 + height / 2 - height / 16, width / 2 - width / 20, height / 2 - height / 20, MODE.CONCAVE));
-        g.setColor(new Color(255, 196, 0));
+        g.setColor(ShindowsYellow);
         g.fill(getFlag(x + width / 2 + width / 20, y - height / 50 + height / 2 - height / 16, width / 2 - width / 20, height / 2 - height / 20, MODE.CONVEX));
         g.setTransform(straight);
-        /*g.setColor(Color.white);
-        g.fillOval(x, y, 5, 5);*/
-
     }
 
     private Area getFlag(final int x, final int y, final int width, final int height, final MODE mode) {

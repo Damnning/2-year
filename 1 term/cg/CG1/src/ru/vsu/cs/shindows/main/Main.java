@@ -1,3 +1,7 @@
+package ru.vsu.cs.shindows.main;
+
+import ru.vsu.cs.shindows.forms.MainWindow;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -6,7 +10,7 @@ public class Main {
         MainWindow window = new MainWindow();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        window.setSize((int) (screenSize.width * 0.9), (int) (screenSize.height * 0.9)); // 1015 1000
+        window.setSize((int) (screenSize.height * 0.9), (int) (screenSize.height * 0.9)); // 1015 1000
         window.setVisible(true);
     }
 }

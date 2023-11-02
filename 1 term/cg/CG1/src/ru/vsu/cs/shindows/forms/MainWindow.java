@@ -1,3 +1,5 @@
+package ru.vsu.cs.shindows.forms;
+
 import javax.swing.*;
 
 public class MainWindow extends JFrame {
