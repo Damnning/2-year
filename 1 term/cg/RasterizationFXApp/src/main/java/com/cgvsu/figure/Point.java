@@ -3,27 +3,26 @@ package com.cgvsu.figure;
 public record Point(int x, int y) implements Comparable<Point> {
 
     @Override
-    public int compareTo(Point p) {
+    public int compareTo(final Point p) {
         if (y > p.y) return 1;
         else if (y < p.y) return -1;
         else {
-            if (x > p.x) return 1;
-            else if (x < p.x) return -1;
-            else return 0;
+            return Integer.compare(x, p.x);
         }
     }
 
-    static public int getXAtLine(Point p1, Point p2, int y) {
-        return (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
+    static public int getXAtLine(final Point p1, final Point p2, int y) {
+        if(p1.y == p2.y) return p1.x;
+        else return (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
     }
 
-    static public Point max(Point p1, Point p2) {
-        if (p1.compareTo(p2) >= 0) return p1;
-        else return p2;
+    public static double distance(Point p1, Point p2) {
+        return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     }
-
-    static public Point min(Point p1, Point p2) {
-        if (p1.compareTo(p2) <= 0) return p1;
-        else return p2;
+    public static Point minus(Point p1, Point p2) {
+        return new Point(p1.x - p2.x, p1.y - p2.y);
+    }
+    public static int dot(Point p1, Point p2) {
+        return p1.x * p2.x + p1.y * p2.y;
     }
 }
