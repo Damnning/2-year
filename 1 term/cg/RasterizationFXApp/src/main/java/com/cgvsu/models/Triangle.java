@@ -81,10 +81,13 @@ public class Triangle {
         double gamma = (1-alpha-beta)*0.9;
         double r = c1.getRed() * alpha + c2.getRed() * beta + c3.getRed() * gamma;
         if(r >= 1) r = 1;
+        else if(r <= 0) r = 0;
         double g = c1.getGreen() * alpha + c2.getGreen() * beta + c3.getGreen() * gamma;
         if(g >= 1) g = 1;
+        else if(g <= 0) g = 0;
         double b = c1.getBlue() * alpha + c2.getBlue() * beta + c3.getBlue() * gamma;
         if(b >= 1) b = 1;
+        else if(b <= 0) b = 0;
         return new Color(r,g,b,1);
     }
 }
