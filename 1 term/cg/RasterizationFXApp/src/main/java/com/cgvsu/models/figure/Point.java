@@ -1,4 +1,4 @@
-package com.cgvsu.figure;
+package com.cgvsu.models.figure;
 
 public record Point(int x, int y) implements Comparable<Point> {
 
@@ -16,9 +16,6 @@ public record Point(int x, int y) implements Comparable<Point> {
         else return (y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
     }
 
-    public static double distance(Point p1, Point p2) {
-        return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
-    }
     public static Point minus(Point p1, Point p2) {
         return new Point(p1.x - p2.x, p1.y - p2.y);
     }

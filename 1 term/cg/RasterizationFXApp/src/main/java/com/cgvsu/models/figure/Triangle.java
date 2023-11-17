@@ -1,4 +1,4 @@
-package com.cgvsu.figure;
+package com.cgvsu.models.figure;
 
 import javafx.scene.paint.Color;
 
@@ -10,14 +10,9 @@ public class Triangle {
     private final Point v2;
     private final Point v3;
     private final Point h;
-    private final double area;
 
     public Point getV1() {
         return v1;
-    }
-
-    public Point getV2() {
-        return v2;
     }
 
     public Point getV3() {
@@ -30,7 +25,6 @@ public class Triangle {
         this.v2 = points.get(1);
         this.v3 = points.get(2);
         h = new Point(Point.getXAtLine(this.v1, this.v3, this.v2.y()), this.v2.y());
-        area = getArea(v1, v2, v3) + Math.exp(-9);
     }
 
     public Triangle(final int x1, final int y1, final int x2, final int y2, final int x3, final int y3) {
@@ -57,13 +51,6 @@ public class Triangle {
             else
                 return Point.getXAtLine(v3, v2, y);
         }
-    }
-    static private double getArea(Point p1, Point p2, Point p3) {
-        double a = Point.distance(p1,p2);
-        double b = Point.distance(p2,p3);
-        double c = Point.distance(p3,p1);
-        double p = (a+b+c)/2;
-        return Math.sqrt(p*(p-a)*(p-b)*(p-c));
     }
     public Color getColor(final Color c1, final Color c2, final Color c3, final int x, final int y) {
         Point p = new Point(x,y);
