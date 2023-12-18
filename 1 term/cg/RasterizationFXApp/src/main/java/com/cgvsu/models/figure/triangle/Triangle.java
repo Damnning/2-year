@@ -1,37 +1,59 @@
-package com.cgvsu.models.figure;
+package com.cgvsu.models.figure.triangle;
 
+import com.cgvsu.models.figure.Point;
 import javafx.scene.paint.Color;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Triangle {
+public abstract class Triangle {
     private final Point v1;
     private final Point v2;
     private final Point v3;
     private final Point h;
+    private boolean isLeft;
 
     public Point getV1() {
         return v1;
     }
-
+    public Point getV2() {
+        return v2;
+    }
+    public Point getH() {
+        return h;
+    }
     public Point getV3() {
         return v3;
     }
 
-    public Triangle(final Point v1, final Point v2, final Point v3) {
+    public static Triangle getTriangle(final Point v1, final Point v2, final Point v3) {
+        if(v2.x() < Point.getXAtLine(v1, v3, v2.y()))
+            return new LeftTriangle(v1, v2, v3);
+        else
+            return new RightTriangle(v1, v3, v2);
+    }
+    public static Triangle getTriangle(final int x1, final int y1, final int x2, final int y2, final int x3, final int y3) {
+        return getTriangle(new Point(x1, y1), new Point(x2, y2), new Point(x3, y3));
+    }
+    protected Triangle(final Point v1, final Point v2, final Point v3) {
         List<Point> points = Stream.of(v1, v2, v3).sorted().toList();
         this.v1 = points.get(0);
         this.v2 = points.get(1);
         this.v3 = points.get(2);
         h = new Point(Point.getXAtLine(this.v1, this.v3, this.v2.y()), this.v2.y());
+        isLeft = v2.x() < h.x();
     }
 
-    public Triangle(final int x1, final int y1, final int x2, final int y2, final int x3, final int y3) {
+    protected Triangle(final int x1, final int y1, final int x2, final int y2, final int x3, final int y3) {
         this(new Point(x1, y1), new Point(x2, y2), new Point(x3, y3));
     }
 
-    public int getLeftBoundAtY(final int y) {
+    public abstract int getUpperLeftBoundAtY(final int y);
+    public abstract int getUpperRightBoundAtY(final int y);
+    public abstract int getLowerLeftBoundAtY(final int y);
+    public abstract int getLowerRightBoundAtY(final int y);
+/*
+    public int getLeftBoundAtY(final int y) { //todo: divide in two methods for upper triangle and lower triangle
         if (v2.x() < h.x()) {
             if (y <= h.y())
                 return Point.getXAtLine(v1, v2, y);
@@ -40,6 +62,30 @@ public class Triangle {
         } else {
             return Point.getXAtLine(v1, v3, y);
         }
+    }
+    public int getUpperLeftBoundAtY(final int y) {
+        if(isLeft)
+            return Point.getXAtLine(v1, v2, y);
+        else
+            return Point.getXAtLine(v1, v3, y);
+    }
+    public int getUpperRightBoundAtY(final int y) {
+        if(isLeft)
+            return Point.getXAtLine(v3, v1, y);
+        else
+            return Point.getXAtLine(v2, v1, y);
+    }
+    public int getLowerLeftBoundAtY(final int y) {
+        if(isLeft)
+            return Point.getXAtLine(v2, v3, y);
+        else
+            return Point.getXAtLine(v1, v3, y);
+    }
+    public int getLowerRightBoundAtY(final int y) {
+        if(isLeft)
+            return Point.getXAtLine(v3, v1, y);
+        else
+            return Point.getXAtLine(v3, v2, y);
     }
 
     public int getRightBoundAtY(final int y) {
@@ -51,8 +97,8 @@ public class Triangle {
             else
                 return Point.getXAtLine(v3, v2, y);
         }
-    }
-    public Color getColor(final Color c1, final Color c2, final Color c3, final int x, final int y) {
+    }*/
+    public Color getColor(final Color c1, final Color c2, final Color c3, final int x, final int y) { //todo: take out method for getting barycentric coords
         Point p = new Point(x,y);
         Point p0 = Point.minus(v2,v1);
         Point p1 = Point.minus(v3,v1);

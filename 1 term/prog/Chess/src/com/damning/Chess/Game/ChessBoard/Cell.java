@@ -16,17 +16,21 @@ public class Cell {
         this(x, y, null);
 
     }
+
     public Cell(int x, int y, Figure figure) {
         this.x = x;
         this.y = y;
         this.figure = figure;
     }
+
     int getX() {
         return x;
     }
+
     int getY() {
         return y;
     }
+
     Figure getFigure() {
         return figure;
     }

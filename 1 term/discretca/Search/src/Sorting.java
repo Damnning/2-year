@@ -19,6 +19,28 @@ public class Sorting {
         System.out.println("]");
 
     }
+    static public int insertionSort(int[] array) {
+        int comparisons = 0;
+        for (int left = 0; left < array.length; left++) {
+            // Вытаскиваем значение элемента
+            int value = array[left];
+            // Перемещаемся по элементам, которые перед вытащенным элементом
+            int i = left - 1;
+            for (; i >= 0; i--) {
+                comparisons++;
+                // Если вытащили значение меньшее — передвигаем больший элемент дальше
+                if (value < array[i]) {
+                    array[i + 1] = array[i];
+                } else {
+                    // Если вытащенный элемент больше — останавливаемся
+                    break;
+                }
+            }
+            // В освободившееся место вставляем вытащенное значение
+            array[i + 1] = value;
+        }
+        return comparisons;
+    }
 
     static public int shakerSort(int[] arr) {
         int comparisons = 0;
@@ -50,5 +72,53 @@ public class Sorting {
         }
         printArray(arr);
         return comparisons;
+    }
+    public static int quickSort(int[] array) {
+         return quickSort(array, 0, array.length - 1,0);
+
+    }
+    private static int quickSort(int[] array, int low, int high, int comparisons) {
+        if (array.length == 0)
+            return comparisons;//завершить выполнение, если длина массива равна 0
+
+        if (low >= high)
+            return comparisons;//завершить выполнение если уже нечего делить
+
+        // выбрать опорный элемент
+        int middle = low + (high - low) / 2;
+        int opora = array[middle];
+
+        // разделить на подмассивы, который больше и меньше опорного элемента
+        int i = low, j = high;
+        while (i <= j) {
+            while (array[i] < opora) {
+                comparisons++;
+                i++;
+            }
+
+            while (array[j] > opora) {
+                comparisons++;
+                j--;
+            }
+
+            if (i <= j) {//меняем местами
+                int temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+                i++;
+                j--;
+            }
+        }
+
+        // вызов рекурсии для сортировки левой и правой части
+        if (low < j)
+            comparisons += quickSort(array, low, j,comparisons);
+
+        if (high > i)
+            comparisons += quickSort(array, i, high,comparisons);
+        return comparisons;
+    }
+    public static int mergeSort(int[] array) {
+
     }
 }

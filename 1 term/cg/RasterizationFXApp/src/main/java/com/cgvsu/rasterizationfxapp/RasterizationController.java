@@ -43,13 +43,13 @@ public class RasterizationController {
         Rasterization.drawTriangle(canvas.getGraphicsContext2D(), x1, y1, x2, y2, x3, y3, color1, color2, color3);
     }
 
-    private void handleKeyPressed(KeyEvent keyEvent) {
+    private void handleKeyPressed(final KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.R))
             drawRandomTriangle();
         changeMode(keyEvent);
     }
 
-    private void changeMode(KeyEvent keyEvent) {
+    private void changeMode(final KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.DIGIT1))
             mode = Channel.RED;
         if (keyEvent.getCode().equals(KeyCode.DIGIT2))
@@ -58,7 +58,7 @@ public class RasterizationController {
             mode = Channel.BLUE;
     }
 
-    private void handleMouseDragged(MouseEvent event) {
+    private void handleMouseDragged(final MouseEvent event) {
         int mouseX = (int) event.getX();
         int mouseY = (int) event.getY();
         if (event.getButton().equals(MouseButton.PRIMARY)) {
@@ -88,11 +88,11 @@ public class RasterizationController {
     }
 
 
-    private boolean checkRange(int x, int y, int xt, int yt) {
+    private boolean checkRange(final int x, final int y, final int xt, final int yt) {
         return (Math.abs(x - xt) < vertexRange) && (Math.abs(y - yt) < vertexRange);
     }
 
-    private Color changeColor(double x, int xc, Color c, Channel channel) {
+    private Color changeColor(final double x, final int xc, final Color c, final Channel channel) {
         double cx = (x - xc + vertexRange) / (vertexRange * 2);
         if (cx > 1) cx = 1;
         else if (cx < 0) cx = 0;
