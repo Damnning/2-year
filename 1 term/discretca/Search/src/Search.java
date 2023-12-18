@@ -1,4 +1,3 @@
-import java.util.Arrays;
 
 /**
  * Returns the index of the key in the array and the number of steps

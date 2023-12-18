@@ -1,12 +1,18 @@
+import java.util.Arrays;
+
 public class Sorting {
+    private int counter = 0;
+    public int getCounter() {
+        return counter;
+    }
     public static final String SWAP_COLOR = "\u001B[32m";
     public static final String ANSI_RESET = "\u001B[0m";
 
-    static private void printArray(int[] arr) {
+    private void printArray(int[] arr) {
         printArray(arr, -1, -1);
     }
 
-    static private void printArray(int[] arr, int num1, int num2) {
+    private void printArray(int[] arr, int num1, int num2) {
         System.out.print("[");
         String color;
         for (int i = 0; i < arr.length; i++) {
@@ -19,7 +25,7 @@ public class Sorting {
         System.out.println("]");
 
     }
-    static public int insertionSort(int[] array) {
+    public int insertionSort(int[] array) {
         int comparisons = 0;
         for (int left = 0; left < array.length; left++) {
             // Вытаскиваем значение элемента
@@ -42,7 +48,7 @@ public class Sorting {
         return comparisons;
     }
 
-    static public int shakerSort(int[] arr) {
+    public int shakerSort(int[] arr) {
         int comparisons = 0;
         int left = 0;
         int right = arr.length - 1;
@@ -73,11 +79,11 @@ public class Sorting {
         printArray(arr);
         return comparisons;
     }
-    public static int quickSort(int[] array) {
+    public int quickSort(int[] array) {
          return quickSort(array, 0, array.length - 1,0);
 
     }
-    private static int quickSort(int[] array, int low, int high, int comparisons) {
+    private int quickSort(int[] array, int low, int high, int comparisons) {
         if (array.length == 0)
             return comparisons;//завершить выполнение, если длина массива равна 0
 
@@ -118,7 +124,43 @@ public class Sorting {
             comparisons += quickSort(array, i, high,comparisons);
         return comparisons;
     }
-    public static int mergeSort(int[] array) {
-
+    public int[] mergeSort(int[] array) {
+        if(array.length < 2) {
+            return array;
+        }
+        int n = array.length;
+        int mid = n/2;
+        int[] left = Arrays.copyOf(array, mid);
+        int[] right = Arrays.copyOfRange(array, mid, n);
+        left = mergeSort(left);
+        right = mergeSort(right);
+        return merge(left, right);
+    }
+    private int[] merge(int[] left, int[] right) {
+        int[] result = new int[left.length + right.length];
+        int i = 0;
+        int j = 0;
+        while(i < left.length && j < right.length) {
+            counter++;
+            if (left[i] < right[j]) {
+                result[i + j] = left[i];
+                i++;
+            } else {
+                result[i + j] = right[j];
+                j++;
+            }
+        }
+        if(i == left.length) {
+            while(j < right.length) {
+                result[i + j] = right[j];
+                j++;
+            }
+        } else {
+            while(i < left.length) {
+                result[i + j] = left[i];
+                i++;
+            }
+        }
+        return result;
     }
 }
