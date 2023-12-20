@@ -1,4 +1,4 @@
-package com.damning.model;
+package main.java.com.damning.model;
 import cg.vsu.render.math.vector.Vector2f;
 import cg.vsu.render.math.vector.Vector3f;
 

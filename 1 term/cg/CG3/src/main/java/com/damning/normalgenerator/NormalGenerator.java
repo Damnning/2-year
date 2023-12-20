@@ -1,9 +1,9 @@
-package com.damning.normalgenerator;
+package main.java.com.damning.normalgenerator;
 
 
 import cg.vsu.render.math.vector.Vector3f;
-import com.damning.model.Model;
-import com.damning.model.Polygon;
+import main.java.com.damning.model.Model;
+import main.java.com.damning.model.Polygon;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -13,6 +13,9 @@ public class NormalGenerator {
      * @param model - model to generate normals
      */
     public void generateNormals(Model model) {
+        if(model.polygons.isEmpty()) {
+            return;
+        }
         HashMap<Integer, List<Polygon>> verticesPolygonsMap = getVertexPolygonsMap(model.polygons);
         HashMap<Polygon, Vector3f> polygonsNormalsMap = getPolygonNormalMap(model.polygons, model.vertices);
         ArrayList<Vector3f> normals = new ArrayList<>();
@@ -100,23 +103,4 @@ public class NormalGenerator {
     public List<Vector3f> getPolygonVertices(Polygon p, List<Vector3f> vertices) {
         return p.getVertexIndices().stream().map(vertices::get).collect(Collectors.toList());
     }
-/*    public List<Vector3f> generateVerticesNormals(Model model) {
-        List<Vector3f> normals = new ArrayList<>();
-        return null;
-    }
-
-
-    public List<Vector3f> generatePolygonsNormals(List<Polygon> polygons, List<Vector3f> vertices) {
-        List<Vector3f> normals = new ArrayList<>();
-        for (Polygon p : polygons) {
-            if (p.getVertexIndices().size() > 2) { // todo: check if direction is correct
-                Vector3f a = new Vector3f(vertices.get(p.getVertexIndices().get(1))).
-                        sub(vertices.get(p.getVertexIndices().get(0)));
-                Vector3f b = new Vector3f(vertices.get(p.getVertexIndices().get(2))).
-                        sub(vertices.get(p.getVertexIndices().get(0)));
-                normals.add(a.crs(b).nor());
-            }
-        }
-        return normals;
-    }*/
 }

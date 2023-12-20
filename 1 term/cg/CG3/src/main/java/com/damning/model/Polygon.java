@@ -1,4 +1,4 @@
-package com.damning.model;
+package main.java.com.damning.model;
 
 import java.util.ArrayList;
 
